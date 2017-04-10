@@ -1,6 +1,6 @@
 /* Preprocessing pipeline for short reads to be used in Outbreak monitoring */
 
-params.bloomfilter = "$workflow.projectDir/filter/Acinetobacter_baumannii.bf $workflow.projectDir/filter/Enterococcus_faecalis_V583.bf $workflow.projectDir/filter/Staphylococcus_aureus_NCTC8325.bf $workflow.projectDir/filter/Streptococcus_pneumoniae_R6.bf $workflow.projectDir/filter/Escherichia_coli_K12.bf"
+params.bloomfilter = "$workflow.projectDir/filter/Acinetobacter_baumannii.bf $workflow.projectDir/filter/Enterococcus_faecalis_V583.bf $workflow.projectDir/filter/Staphylococcus_aureus_NCTC8325.bf $workflow.projectDir/filter/Streptococcus_pneumoniae_R6.bf $workflow.projectDir/filter/Escherichia_coli_K12.bf $workflow.projectDir/filter/Klebsiella_pneumoniae.bf"
 
 TRIMMOMATIC = file(params.trimmomatic)
 BLOOMFILTER = params.bloomfilter
@@ -78,3 +78,40 @@ process Bloomfilter {
 
 }
 
+process resultBiobloom {
+
+  tag "${id}"
+  publishDir "${OUTDIR}"
+
+  input: 
+  set id,file(bloom) from outputBiobloom
+
+  output:
+  set id,file(bloomresult) into outputBloomresult
+
+  script:
+
+  bloomresult = id + ".species"
+
+  """
+	#!/bin/env ruby
+
+	lines = IO.readlines('$bloom')
+
+	header = lines.shift.split(' ')
+
+	species = "unknown_species"
+	lines.each do |line|
+		elements = line.strip.split(' ')
+		hit_rate = elements[4].to_f
+		hits = elements[1].to_i
+		organism = elements[0]
+		species = organism if hits > 500000	
+	end		
+
+	f = File.new('$bloomresult','w+')
+	f.puts species
+	f.close
+  """
+			
+}

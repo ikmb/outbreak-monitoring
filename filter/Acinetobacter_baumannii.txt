@@ -1,0 +1,14 @@
+[user_input_options]
+filter_id=Acinetobacter_baumannii
+kmer_size=25
+desired_false_positve_rate=0.0075
+number_of_hash_functions=7
+expected_num_entries=4335768
+sequence_sources=Acinetobacter_baumannii.fa 
+
+[runtime_options]
+size=44155712
+num_entries=4081869
+approximate_false_positive_rate=0.00557236
+redundant_sequences=253900
+redundant_fpr=0.00089505

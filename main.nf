@@ -1,7 +1,10 @@
 /* Preprocessing pipeline for short reads to be used in Outbreak monitoring */
 
+params.bloomfilter = "$workflow.projectDir/filter/Acinetobacter_baumannii.bf $workflow.projectDir/filter/Enterococcus_faecalis_V583.bf $workflow.projectDir/filter/Staphylococcus_aureus_NCTC8325.bf $workflow.projectDir/filter/Streptococcus_pneumoniae_R6.bf $workflow.projectDir/filter/Escherichia_coli_K12.bf"
+
 TRIMMOMATIC = file(params.trimmomatic)
 BLOOMFILTER = params.bloomfilter
+OUTDIR=params.outdir
 
 leading = params.leading
 trailing = params.trailing
@@ -48,9 +51,7 @@ process Trimmomatic {
    script:
 
     """
-        java -jar ${TRIMMOMATIC}/trimmomatic-0.36.jar PE -threads 8 $left_reads $right_reads -baseout ${id} ILLUMINACLIP:${TRIMMOMATIC}/adapters/${adapters}:2:30:10:3:TRUE LEADING:${leading} TRAILING:${trailing} SLIDINGWINDOW:${slidingwindow} MINLEN:${minlen}
-        mv ${id}_1P ${id}_1P.fastq.gz
-        mv ${id}_2P ${id}_2P.fastq.gz
+        java -jar ${TRIMMOMATIC}/trimmomatic-0.36.jar PE -threads 8 $left_reads $right_reads ${id}_1P.fastq.gz ${id}_1U.fastq.gz ${id}_2P.fastq.gz ${id}_2U.fastq.gz ILLUMINACLIP:${TRIMMOMATIC}/adapters/${adapters}:2:30:10:3:TRUE LEADING:${leading} TRAILING:${trailing} SLIDINGWINDOW:${slidingwindow} MINLEN:${minlen}
     """
 
 }

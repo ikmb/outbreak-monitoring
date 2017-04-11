@@ -1,6 +1,6 @@
 /* Preprocessing pipeline for short reads to be used in Outbreak monitoring */
 
-params.bloomfilter = "$workflow.projectDir/filter/Acinetobacter_baumannii.bf $workflow.projectDir/filter/Enterococcus_faecalis_V583.bf $workflow.projectDir/filter/Staphylococcus_aureus_NCTC8325.bf $workflow.projectDir/filter/Streptococcus_pneumoniae_R6.bf $workflow.projectDir/filter/Escherichia_coli_K12.bf $workflow.projectDir/filter/Klebsiella_pneumoniae.bf"
+params.bloomfilter = "$workflow.projectDir/filter/Acinetobacter_baumannii.bf $workflow.projectDir/filter/Enterococcus_faecalis_V583.bf $workflow.projectDir/filter/Staphylococcus_aureus_NCTC8325.bf $workflow.projectDir/filter/Streptococcus_pneumoniae_R6.bf $workflow.projectDir/filter/Escherichia_coli_K12.bf $workflow.projectDir/filter/Klebsiella_pneumoniae.bf $workflow.projectDir/filter/Pseudomonas_aeruginosa_PAO1.bf"
 
 REPORT_SCRIPT = workflow.projectDir + "/scripts/report.rb"
 
@@ -23,7 +23,7 @@ Channel
 process Fastqc {
 
    tag "${id}"
-   publishDir "${OUTDIR}/${id}/FastQC/", mode: 'copy'
+   publishDir "${OUTDIR}/Data/${id}/FastQC/", mode: 'copy'
 
     input:
     set id, file(left_reads), file(right_reads) from inputFastqc
@@ -41,7 +41,7 @@ process Fastqc {
 process Bloomfilter {
 
   tag "${id}"
-  publishDir "${OUTDIR}/${id}"
+  publishDir "${OUTDIR}/Data/${id}"
 
   input:
   set id,file(left_reads),file(right_reads) from inputBloomfilter
@@ -63,7 +63,7 @@ process Bloomfilter {
 process resultBiobloom {
 
   tag "${id}"
-  publishDir "${OUTDIR}/${id}"
+  publishDir "${OUTDIR}/Data/${id}"
 
   input: 
   set id,file(bloom),file(left_reads),file(right_reads) from outputBiobloom

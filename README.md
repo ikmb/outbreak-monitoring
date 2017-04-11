@@ -22,7 +22,7 @@ In the topfolder you will find one subfolder per input PE library with
 * FastQC statistics
 * Bloomfilter raw outut
 
-In addition, the topfolder will contain one file per input library with a species assignment based on bloom filter mappings. Currently, the following species are supported:
+In addition, the topfolder will contain one folder per supported species with the trimmed read files. Currently, the following species are supported:
 * E. coli
 * S. aureus
 * S. pneumoniae
@@ -30,7 +30,6 @@ In addition, the topfolder will contain one file per input library with a specie
 * E. faecalis
 * A. baumannii
 
-Should your data contain any other species, it will NOT be detected in this manner. Consider expanding the bloom filter set should additional species be of interest. 
-
+Should your data contain any other species, the respective reads will be put in the folder "noMatch" fur manual follow up. Should the reads belong to a species not yet supported, consider adding a bloom filter. 
 
 

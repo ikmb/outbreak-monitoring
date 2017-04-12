@@ -94,7 +94,7 @@ process Trimmomatic {
 
    script:
    
-   organism = file("${OUTDIR}/${id}/${id}.species").text.trim()
+   organism = file("${OUTDIR}/Data/${id}/${id}.species").text.trim()
  
    """
 	java -jar ${TRIMMOMATIC}/trimmomatic-0.36.jar PE -threads 8 $left_reads $right_reads ${id}_R1_paired.fastq.gz ${id}_1U.fastq.gz ${id}_R2_paired.fastq.gz ${id}_2U.fastq.gz ILLUMINACLIP:${TRIMMOMATIC}/adapters/${adapters}:2:30:10:3:TRUE LEADING:${leading} TRAILING:${trailing} SLIDINGWINDOW:${slidingwindow} MINLEN:${minlen}

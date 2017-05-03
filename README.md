@@ -7,12 +7,15 @@
 This pipeline performs preprocessing of short reads to be used in Outbreak Monitoring. 
 * Read trimming and cleaning (Trimmomatic)
 * Taxonomic assignment using bloom filters
+* Fall-back taxonomic assignment using Pathoscope 2.0.6 (in cases where bloom filters fail)
 
 ## Executing the pipeline 
 
 The pipeline starts from a folder (should contain PE FastQ files), generates a Fastqc report, performs adapter trimming (Nextera) and finally runs a subset of 1Mio reads against a set of bloom filters for species identification.
 
 `nextflow -c nextflow.config run main.nf --folder /path/to/reads`
+
+Note: This pipeline cannot be executed directly from gitlab as it requires certain files from the project to be local (the bloom filters). 
 
 ## Reading the output
 

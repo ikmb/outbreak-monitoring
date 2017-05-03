@@ -1,0 +1,14 @@
+[user_input_options]
+filter_id=Enterobacter_cloacae
+kmer_size=25
+desired_false_positve_rate=0.0075
+number_of_hash_functions=7
+expected_num_entries=5598724
+sequence_sources=Enterobacter_cloacae.fa 
+
+[runtime_options]
+size=57017728
+num_entries=5423441
+approximate_false_positive_rate=0.00641815
+redundant_sequences=175258
+redundant_fpr=0.00103833

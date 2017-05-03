@@ -1,0 +1,14 @@
+[user_input_options]
+filter_id=Enterobacter_aerogenes
+kmer_size=25
+desired_false_positve_rate=0.0075
+number_of_hash_functions=7
+expected_num_entries=5280326
+sequence_sources=Enterobacter_aerogenes.fa 
+
+[runtime_options]
+size=53775168
+num_entries=5203325
+approximate_false_positive_rate=0.00698099
+redundant_sequences=76976
+redundant_fpr=0.00113436

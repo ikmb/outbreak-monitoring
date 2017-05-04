@@ -1,6 +1,6 @@
 /* Preprocessing pipeline for short reads to be used in Outbreak monitoring */
 
-params.bloomfilter = "$workflow.projectDir/filter/Acinetobacter_baumannii.bf $workflow.projectDir/filter/Enterococcus_faecalis_V583.bf $workflow.projectDir/filter/Staphylococcus_aureus_NCTC8325.bf $workflow.projectDir/filter/Streptococcus_pneumoniae_R6.bf $workflow.projectDir/filter/Escherichia_coli_K12.bf $workflow.projectDir/filter/Klebsiella_pneumoniae.bf $workflow.projectDir/filter/Pseudomonas_aeruginosa_PAO1.bf $workflow.projectDir/filter/Enterobacter_cloacae.bf $workflow.projectDir/filter/Enterobacter_aerogenes.bf"
+params.bloomfilter = "$workflow.projectDir/filter/Acinetobacter_baumannii.bf $workflow.projectDir/filter/Enterococcus_faecalis_V583.bf $workflow.projectDir/filter/Staphylococcus_aureus_NCTC8325.bf $workflow.projectDir/filter/Streptococcus_pneumoniae_R6.bf $workflow.projectDir/filter/Escherichia_coli_K12.bf $workflow.projectDir/filter/Klebsiella_pneumoniae.bf $workflow.projectDir/filter/Pseudomonas_aeruginosa_PAO1.bf $workflow.projectDir/filter/Enterobacter_cloacae.bf $workflow.projectDir/filter/Enterobacter_aerogenes.bf $workflow.projectDir/filter/Enterococcus_faecium.bf"
 
 REPORT_SCRIPT = workflow.projectDir + "/scripts/report.rb"
 
@@ -21,29 +21,7 @@ FOLDER=file(params.folder)
 
 Channel
   .fromFilePairs(FOLDER + "/*_R{1,2}_001.fastq.gz", flat: true)
-  .into { inputTrimmomatic }
-
-process Trimmomatic {
-
-   tag "${id}"
-   publishDir "${OUTDIR}/Data/${id}/Trimmomatic", mode: 'copy'
-
-   input:
-   set id,file(left_reads),file(right_reads) from inputTrimmomatic
-
-   output:
-   set id, file("${id}_R1_paired.fastq.gz"), file("${id}_R2_paired.fastq.gz") into inputFastqc, inputBioBloom
-
-   script:
-
-   """
-        java -jar ${TRIMMOMATIC}/trimmomatic-0.36.jar PE -threads 8 $left_reads $right_reads \
-	${id}_R1_paired.fastq.gz ${id}_1U.fastq.gz ${id}_R2_paired.fastq.gz ${id}_2U.fastq.gz \
-	ILLUMINACLIP:${TRIMMOMATIC}/adapters/${adapters}:2:30:10:3:TRUE\
-	LEADING:${leading} TRAILING:${trailing} SLIDINGWINDOW:${slidingwindow} MINLEN:${minlen}
-   """
-
-}
+  .into { inputBioBloom }
 
 process Bloomfilter {
 
@@ -61,7 +39,7 @@ process Bloomfilter {
   bloom = id + "_summary.tsv"
 
   """
-	biobloomcategorizer -p $id -e -t 4 -f "$BLOOMFILTER" $left_reads $right_reads
+	biobloomcategorizer -p $id -e -s 0.01 -t 4 -f "$BLOOMFILTER" $left_reads $right_reads
 
   """
 
@@ -76,7 +54,7 @@ process resultBiobloom {
   set id,file(bloom),file(left_reads),file(right_reads) from outputBloomfilter
 
   output:
-  set id,file(bloomresult),file(left_reads),file(right_reads) into outputResultBiobloom
+  set id,file(bloomresult),file(left_reads),file(right_reads) into inputTrimmomatic
 
   script:
 
@@ -87,23 +65,28 @@ process resultBiobloom {
   """
 }
 
-process Publish {
 
-  tag "${id}"
-  publishDir "${OUTDIR}/${organism}", mode: 'copy'
+process Trimmomatic {
 
-  input:
-  set id,file(bloomresult),file(left_reads),file(right_reads) from outputResultBiobloom
+   tag "${id}"
+   publishDir "${OUTDIR}/${organism}", mode: 'copy'
 
-  output:
-  set id,organism,file(left_reads),file(right_reads) into inputPathoscopeMap
+   input:
+   set id,file(organism_file),file(left_reads),file(right_reads) from inputTrimmomatic
 
-  script:
-  organism = file("${OUTDIR}/Data/${id}/${id}.species").text.trim()
-   
-  """
-	echo $organism > /dev/null
-  """
+   output:
+   set id,organism,file("${id}_R1_paired.fastq.gz"), file("${id}_R2_paired.fastq.gz") into inputFastqc,inputPathoscopeMap
+
+   script:
+
+   organism = file("${OUTDIR}/Data/${id}/${id}.species").text.trim()   
+
+    """
+        java -jar ${TRIMMOMATIC}/trimmomatic-0.36.jar PE -threads 8 $left_reads $right_reads \
+        ${id}_R1_paired.fastq.gz ${id}_1U.fastq.gz ${id}_R2_paired.fastq.gz ${id}_2U.fastq.gz \
+        ILLUMINACLIP:${TRIMMOMATIC}/adapters/${adapters}:2:30:10:3:TRUE\
+        LEADING:${leading} TRAILING:${trailing} SLIDINGWINDOW:${slidingwindow} MINLEN:${minlen} && sleep 5
+   """
 
 }
 

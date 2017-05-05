@@ -1,7 +1,5 @@
 /* Preprocessing pipeline for short reads to be used in Outbreak monitoring */
 
-params.bloomfilter = "$workflow.projectDir/filter/Acinetobacter_baumannii.bf $workflow.projectDir/filter/Enterococcus_faecalis_V583.bf $workflow.projectDir/filter/Staphylococcus_aureus_NCTC8325.bf $workflow.projectDir/filter/Streptococcus_pneumoniae_R6.bf $workflow.projectDir/filter/Escherichia_coli_K12.bf $workflow.projectDir/filter/Klebsiella_pneumoniae.bf $workflow.projectDir/filter/Pseudomonas_aeruginosa_PAO1.bf $workflow.projectDir/filter/Enterobacter_cloacae.bf $workflow.projectDir/filter/Enterobacter_aerogenes.bf $workflow.projectDir/filter/Enterococcus_faecium.bf"
-
 REPORT_SCRIPT = workflow.projectDir + "/scripts/report.rb"
 
 TRIMMOMATIC = file(params.trimmomatic)
@@ -10,6 +8,8 @@ OUTDIR=params.outdir
 
 PATHOSCOPE_INDEX_DIR=file(params.pathoscope_index_dir)
 PATHOSCOPE=file(params.pathoscope)
+
+FASTQC=file(params.fastqc)
 
 leading = params.leading
 trailing = params.trailing
@@ -20,8 +20,31 @@ adapters = params.adapters
 FOLDER=file(params.folder)
 
 Channel
-  .fromFilePairs(FOLDER + "/*_R{1,2}_001.fastq.gz", flat: true)
-  .into { inputBioBloom }
+        .fromFilePairs(FOLDER + "/*_R{1,2}_001.fastq.gz", flat: true)
+        .map { prefix, file1, file2 ->  tuple(prefix.substring(0,9), file1, file2) }
+        .groupTuple()
+        .into { inputMerge }
+
+process Merge {
+
+	tag "${id}"
+        publishDir("${OUTDIR}/Data/${id}")
+
+        input:
+        set id,forward_reads,reverse_reads from inputMerge
+
+        output:
+        set id,file(left_merged),file(right_merged) into inputBioBloom
+
+        script:
+        left_merged = id + "_R1.fastq.gz"
+        right_merged = id + "_R2.fastq.gz"
+
+        """
+                zcat ${forward_reads.join(" ")} | gzip > $left_merged
+		zcat ${reverse_reads.join(" ")} | gzip > $right_merged
+        """
+}
 
 process Bloomfilter {
 
@@ -61,7 +84,7 @@ process resultBiobloom {
   bloomresult = id + ".species"
 
   """
-	ruby $REPORT_SCRIPT $bloom > $bloomresult
+	ruby $REPORT_SCRIPT $bloom > $bloomresult && sleep 10
   """
 }
 
@@ -103,7 +126,7 @@ process Fastqc {
 
     script:
     """
-    fastqc -t 1 -o . ${left_reads} ${right_reads}
+    $FASTQC -t 1 -o . ${left_reads} ${right_reads}
     """
 
 }

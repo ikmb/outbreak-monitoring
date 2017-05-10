@@ -30,10 +30,13 @@ In addition, the topfolder will contain one folder per supported species with th
 * S. aureus
 * S. pneumoniae
 * K. pneumoniae
+* E. aerogenes
 * E. faecalis
+* E. faecium
 * A. baumannii
 * P. aeruginosa
 
-Should your data contain any other species, the respective reads will be put in the folder "noMatch" fur manual follow up. Should the reads belong to a species not yet supported, consider adding a bloom filter. 
+Should your data contain any other species, the respective reads will be put in the folder "noMatch" fur manual follow up. Should the reads belong to a species not yet supported, consider adding a new bloom filter. 
+
 
 

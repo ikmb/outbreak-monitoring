@@ -17,12 +17,11 @@ lines.each do |line|
 end
 
 current_max = 0.0
+
 bucket.each do |organism,rate|
 	if rate > current_max && rate > 0.3
-		unless organism == "noMatch" && current_max > 0.3
-			species = organism		
-			current_max = rate
-		end
+		species = organism		
+		current_max = rate
 	end
 end
 

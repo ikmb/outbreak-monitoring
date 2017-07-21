@@ -1,3 +1,4 @@
+![](images/ikmb_bfx_logo.png)
 # Outbreak monitoring read preprocessing
 
 ## UNDER CONSTRUCTION

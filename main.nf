@@ -129,10 +129,10 @@ process runAriba {
 
    script:
 
-   report = "out.run/report.tsv"
+   report = "out.${id}.run/report.tsv"
 
    """
-	ariba run $ARIBA_DB $left $right out.run
+	ariba run $ARIBA_DB $left $right out.${id}.run
    """	
 
 }
@@ -150,7 +150,7 @@ process runAribaSummary {
    summary = "ariba.summary"
 
    """
-    	ariba summary $summary $reports 
+    	ariba summary $summary *.tsv
    """
 
 }

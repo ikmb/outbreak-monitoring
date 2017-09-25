@@ -126,7 +126,8 @@ process Fastqc {
 
     script:
     """
-    $FASTQC -t 1 -o . ${left_reads} ${right_reads}
+    $FASTQC -t 1 -o . ${left_reads} && $FASTQC -t 1 -o . ${right_reads}
+
     """
 
 }

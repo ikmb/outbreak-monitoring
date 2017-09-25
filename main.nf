@@ -98,7 +98,7 @@ process Trimmomatic {
    set id,file(organism_file),file(left_reads),file(right_reads) from inputTrimmomatic
 
    output:
-   set id,organism,file("${id}_R1_paired.fastq.gz"), file("${id}_R2_paired.fastq.gz") into inputFastqc,inputPathoscopeMap
+   set id,organism,file("${id}_R1_paired.fastq.gz"), file("${id}_R2_paired.fastq.gz") into inputFastqc,inputPathoscopeMap, inputAriba
 
    script:
 
@@ -109,6 +109,46 @@ process Trimmomatic {
         ${id}_R1_paired.fastq.gz ${id}_1U.fastq.gz ${id}_R2_paired.fastq.gz ${id}_2U.fastq.gz \
         ILLUMINACLIP:${TRIMMOMATIC}/adapters/${adapters}:2:30:10:3:TRUE\
         LEADING:${leading} TRAILING:${trailing} SLIDINGWINDOW:${slidingwindow} MINLEN:${minlen} && sleep 5
+   """
+
+}
+
+process runAriba {
+
+
+   tag "${id}"
+   publishDir "${OUTDIR}/${organism}", mode: 'copy'
+
+   input:
+   set id,organism,file(left), file(right) from inputAriba
+
+   output:
+   set report into AribaReport
+
+   script:
+
+   report = "out.run/report.tsv"
+
+   """
+	ariba run $ARIBA_DB $left $right out.run
+   """	
+
+}
+
+process runAribaSummary {
+
+   tag "SummarizeAriba (ALL)"
+   publishDir "${OUTDIR}/Ariba", mode: 'copy'
+
+   input:
+   file(reports) from AribaReport.collect()
+
+   script:
+
+   summary = "ariba.summary"
+
+   """
+    	ariba summary $summary $reports 
    """
 
 }

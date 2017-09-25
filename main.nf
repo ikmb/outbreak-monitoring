@@ -146,7 +146,7 @@ process runMultiQCFastq {
     script:
 
     """
-    multiqc -n fastq_multiqc *.zip *.html
+    /ifs/data/nfs_share/ikmb_repository/software/multiqc_local/1.2/bin/multiqc -n fastq_multiqc *.zip *.html
     """
 }
 

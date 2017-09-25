@@ -9,6 +9,8 @@ OUTDIR=params.outdir
 PATHOSCOPE_INDEX_DIR=file(params.pathoscope_index_dir)
 PATHOSCOPE=file(params.pathoscope)
 
+ARIBA_DB=file(params.ariba_db)
+
 FASTQC=file(params.fastqc)
 
 leading = params.leading

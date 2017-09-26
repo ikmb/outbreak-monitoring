@@ -1,0 +1,14 @@
+[user_input_options]
+filter_id=Proteus_mirabilis
+kmer_size=25
+desired_false_positve_rate=0.0075
+number_of_hash_functions=7
+expected_num_entries=4099845
+sequence_sources=Proteus_mirabilis.fa 
+
+[runtime_options]
+size=41753088
+num_entries=4021195
+approximate_false_positive_rate=0.00682273
+redundant_sequences=78652
+redundant_fpr=0.00110731

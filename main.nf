@@ -100,7 +100,7 @@ process Trimmomatic {
    set id,file(organism_file),file(left_reads),file(right_reads) from inputTrimmomatic
 
    output:
-   set id,organism,file("${id}_R1_paired.fastq.gz"), file("${id}_R2_paired.fastq.gz") into inputFastqc,inputPathoscopeMap, inputAriba
+   set id,organism,file("${id}_R1_paired.fastq.gz"), file("${id}_R2_paired.fastq.gz") into (inputFastqc,inputPathoscopeMap, inputAriba)
 
    script:
 
@@ -117,40 +117,49 @@ process Trimmomatic {
 
 process runAriba {
 
-
    tag "${id}"
-   publishDir "${OUTDIR}/${organism}", mode: 'copy'
+   publishDir "${OUTDIR}/${organism}/Ariba", mode: 'copy'
 
    input:
    set id,organism,file(left), file(right) from inputAriba
 
    output:
-   set report into AribaReport
+   set organism,file(report) into AribaReport
 
    script:
 
-   report = "out.${id}.run/report.tsv"
+   report = "report.${id}.tsv"
 
    """
-	ariba run $ARIBA_DB $left $right out.${id}.run
+	ariba run $ARIBA_DB $left $right out.${id}.run && cp out.${id}.run/report.tsv report.${id}.tsv
    """	
 
 }
 
+AribaReport
+	.groupTuple(by: 0 )
+	.set { AribaReportByOrganism }
+
 process runAribaSummary {
 
    tag "SummarizeAriba (ALL)"
-   publishDir "${OUTDIR}/Ariba", mode: 'copy'
+   publishDir "${OUTDIR}/${organism}/Ariba", mode: 'copy'
 
    input:
-   file(reports) from AribaReport.collect()
+   set organism,reports from AribaReportByOrganism
+
+   output:
+   file(summary) into outputAribaSummary
+
+   when:
+   reports.size() > 1
 
    script:
 
    summary = "ariba.summary"
 
    """
-    	ariba summary $summary *.tsv
+        ariba summary $summary $reports
    """
 
 }
@@ -161,7 +170,7 @@ process Fastqc {
    publishDir "${OUTDIR}/Data/${id}/FastQC/", mode: 'copy'
 
     input:
-    set id, file(left_reads), file(right_reads) from inputFastqc
+    set id, organism,file(left_reads), file(right_reads) from inputFastqc
 
     output:
     set file("*.zip"), file("*.html") into outputFastqc

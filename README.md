@@ -45,8 +45,8 @@ Should your data contain any other species, the respective reads will be put in 
 Reference genome sequences can be downloaded from:
 ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/bacteria/
 
-To produce a bloom filter, load BioBloom and rename the Fasta to <genus>_<species>.fa and index it with Samtools.
+To produce a bloom filter, load BioBloom and rename the Fasta to GENUS_SPECIES.fa and index it with Samtools.
 
-Then run the Bloomfilter: biobloommaker -p <genus>_<species> <genus>_<species>.da
+Then run the Bloomfilter: biobloommaker -p GENUS_SPECIES GENUS_SPECIES.fa
 
 

@@ -23,7 +23,7 @@ FOLDER=file(params.folder)
 
 Channel
         .fromFilePairs(FOLDER + "/*_R{1,2}_001.fastq.gz", flat: true)
-        .map { prefix, file1, file2 ->  tuple(prefix.substring(0,9), file1, file2) }
+        .map { prefix, file1, file2 ->  tuple(prefix.split("_")[0..1].join("_"), file1, file2) }
         .groupTuple()
         .into { inputMerge }
 
@@ -51,7 +51,7 @@ process Merge {
 process Bloomfilter {
 
   tag "${id}"
-  publishDir "${OUTDIR}/Data/${id}"
+  publishDir "${OUTDIR}/Data/${id}", mode: 'copy'
 
   input:
   set id,file(left_reads),file(right_reads) from inputBioBloom
@@ -73,7 +73,7 @@ process Bloomfilter {
 process resultBiobloom {
 
   tag "${id}"
-  publishDir "${OUTDIR}/Data/${id}"
+  publishDir "${OUTDIR}/Data/${id}", mode: 'copy'
 
   input: 
   set id,file(bloom),file(left_reads),file(right_reads) from outputBloomfilter
@@ -86,7 +86,8 @@ process resultBiobloom {
   bloomresult = id + ".species"
 
   """
-	ruby $REPORT_SCRIPT $bloom > $bloomresult && sleep 10
+	ruby $REPORT_SCRIPT $bloom > $bloomresult
+	sleep 30
   """
 }
 
@@ -97,20 +98,25 @@ process Trimmomatic {
    publishDir "${OUTDIR}/${organism}", mode: 'copy'
 
    input:
-   set id,file(organism_file),file(left_reads),file(right_reads) from inputTrimmomatic
+   set id,organism_file,file(left_reads),file(right_reads) from inputTrimmomatic
+
+   scratch true
 
    output:
    set id,organism,file("${id}_R1_paired.fastq.gz"), file("${id}_R2_paired.fastq.gz") into (inputFastqc,inputPathoscopeMap, inputAriba)
 
    script:
 
-   organism = file("${OUTDIR}/Data/${id}/${id}.species").text.trim()   
+   organism = file(organism_file).getText()
+   
 
-    """
+   """
         java -jar ${TRIMMOMATIC}/trimmomatic-0.36.jar PE -threads 8 $left_reads $right_reads \
         ${id}_R1_paired.fastq.gz ${id}_1U.fastq.gz ${id}_R2_paired.fastq.gz ${id}_2U.fastq.gz \
         ILLUMINACLIP:${TRIMMOMATIC}/adapters/${adapters}:2:30:10:3:TRUE\
-        LEADING:${leading} TRAILING:${trailing} SLIDINGWINDOW:${slidingwindow} MINLEN:${minlen} && sleep 5
+        LEADING:${leading} TRAILING:${trailing} SLIDINGWINDOW:${slidingwindow} MINLEN:${minlen}
+
+	sleep 5
    """
 
 }
@@ -149,17 +155,20 @@ process runAribaSummary {
    set organism,reports from AribaReportByOrganism
 
    output:
-   file(summary) into outputAribaSummary
+   set file(summary),file(summary_phandango),file(summary_phandango_tre) into outputAribaSummary
 
    when:
    reports.size() > 1
 
    script:
 
-   summary = "ariba.summary"
+   base = "ariba.summary"
+   summary = "ariba.summary.csv"
+   summary_phandango = "ariba.summary.phandango.csv"
+   summary_phandango_tre = "ariba.summary.phandango.tre"
 
    """
-        ariba summary $summary $reports
+        ariba summary $base ${reports.join(" ")}
    """
 
 }
@@ -186,7 +195,7 @@ process Fastqc {
 process runMultiQCFastq {
 
     tag "Generating fastq level summary and QC plots"
-    publishDir "${OUTDIR}/Summary/Fastqc"
+    publishDir "${OUTDIR}/Summary/Fastqc", mode: 'copy'
 
     input:
     file('*') from outputFastqc.flatten().toList()
@@ -204,7 +213,7 @@ process runMultiQCFastq {
 process runPathoscopeMap {
 
    tag "${id}"
-   publishDir "${OUTDIR}/Data/${id}/Pathoscope"
+   publishDir "${OUTDIR}/Data/${id}/Pathoscope", mode: 'copy'
 
    input:
    set id,organism,file(left_reads),file(right_reads) from inputPathoscopeMap
@@ -228,7 +237,7 @@ process runPathoscopeMap {
 process runPathoscopeId {
 
    tag "${id}"
-   publishDir "${OUTDIR}/Data/${id}/Pathoscope"
+   publishDir "${OUTDIR}/Data/${id}/Pathoscope", mode: 'copy'
 
    input:
    set id,file(samfile) from inputPathoscopeId

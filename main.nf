@@ -9,7 +9,13 @@ OUTDIR=params.outdir
 PATHOSCOPE_INDEX_DIR=file(params.pathoscope_index_dir)
 PATHOSCOPE=file(params.pathoscope)
 
-ARIBA_DB=file(params.ariba_db)
+params.ariba_db = "card"
+
+if (params.ariba.containsKey(params.ariba_db) == false) {
+   exit 1, "Specified unknown ariba database, please consult the documentation for valid databases."
+}
+
+ARIBA_DB=params.ariba[params.ariba_db].database
 
 FASTQC=file(params.fastqc)
 
@@ -107,7 +113,7 @@ process Trimmomatic {
 
    script:
 
-   organism = file(organism_file).getText()
+   organism = file(organism_file).getText().trim()
    
 
    """
@@ -116,7 +122,6 @@ process Trimmomatic {
         ILLUMINACLIP:${TRIMMOMATIC}/adapters/${adapters}:2:30:10:3:TRUE\
         LEADING:${leading} TRAILING:${trailing} SLIDINGWINDOW:${slidingwindow} MINLEN:${minlen}
 
-	sleep 5
    """
 
 }
@@ -124,7 +129,7 @@ process Trimmomatic {
 process runAriba {
 
    tag "${id}"
-   publishDir "${OUTDIR}/${organism}/Ariba", mode: 'copy'
+   publishDir "${OUTDIR}/${organism}/Ariba/${params.ariba_db}", mode: 'copy'
 
    input:
    set id,organism,file(left), file(right) from inputAriba

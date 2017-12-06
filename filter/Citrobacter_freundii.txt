@@ -1,0 +1,14 @@
+[user_input_options]
+filter_id=Citrobacter_freundii
+kmer_size=25
+desired_false_positve_rate=0.0075
+number_of_hash_functions=7
+expected_num_entries=5371281
+sequence_sources=Citrobacter_freundii.fa 
+
+[runtime_options]
+size=54701440
+num_entries=5266783
+approximate_false_positive_rate=0.00681351
+redundant_sequences=104500
+redundant_fpr=0.00110573

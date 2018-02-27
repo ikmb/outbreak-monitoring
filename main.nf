@@ -101,7 +101,7 @@ process resultBiobloom {
 process Trimmomatic {
 
    tag "${id}"
-   publishDir "${OUTDIR}/${organism}", mode: 'copy'
+   // publishDir "${OUTDIR}/${organism}", mode: 'copy'
 
    input:
    set id,organism_file,file(left_reads),file(right_reads) from inputTrimmomatic
@@ -218,7 +218,7 @@ process runMultiQCFastq {
 process runPathoscopeMap {
 
    tag "${id}"
-   publishDir "${OUTDIR}/Data/${id}/Pathoscope", mode: 'copy'
+   //publishDir "${OUTDIR}/Data/${id}/Pathoscope", mode: 'copy'
 
    input:
    set id,organism,file(left_reads),file(right_reads) from inputPathoscopeMap
@@ -248,11 +248,11 @@ process runPathoscopeId {
    set id,file(samfile) from inputPathoscopeId
 
    output:
-   set id,file(pathoscope_tsv),file(pathoscope_sam) into outputPathoscopeId
+   set id,file(pathoscope_tsv) into outputPathoscopeId
 
    script:
 
-   pathoscope_sam = "updated_" + samfile
+   //pathoscope_sam = "updated_" + samfile
    pathoscope_tsv = id + "-sam-report.tsv"
 
    """

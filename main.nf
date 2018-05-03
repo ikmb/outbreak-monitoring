@@ -101,7 +101,7 @@ process resultBiobloom {
 process Trimmomatic {
 
    tag "${id}"
-   // publishDir "${OUTDIR}/${organism}", mode: 'copy'
+   publishDir "${OUTDIR}/${organism}", mode: 'copy'
 
    input:
    set id,organism_file,file(left_reads),file(right_reads) from inputTrimmomatic

@@ -85,7 +85,7 @@ process resultBiobloom {
   set id,file(bloom),file(left_reads),file(right_reads) from outputBloomfilter
 
   output:
-  set id,file(bloomresult),file(left_reads),file(right_reads) into inputTrimmomatic
+  set id,file(bloomresult),file(left_reads),file(right_reads) into inputTrimgalore
 
   script:
 
@@ -98,31 +98,34 @@ process resultBiobloom {
 }
 
 
-process Trimmomatic {
+process runTrimgalore {
 
-   tag "${id}"
-   publishDir "${OUTDIR}/${organism}", mode: 'copy'
+   tag "${patientID}|${sampleID}"
+   publishDir "${OUTDIR}/${patientID}/${sampleID}/trimgalore", mode: 'copy',
+        saveAs: {filename ->
+            if (filename.indexOf("_fastqc") > 0) "FastQC/$filename"
+            else if (filename.indexOf("trimming_report.txt") > 0) "logs/$filename"
+            else params.saveTrimmed ? filename : null
+        }
 
    input:
-   set id,organism_file,file(left_reads),file(right_reads) from inputTrimmomatic
-
-   scratch true
+   set val(id),val(oganism),left,right from inputTrimgalore
 
    output:
-   set id,organism,file("${id}_R1_paired.fastq.gz"), file("${id}_R2_paired.fastq.gz") into (inputFastqc,inputPathoscopeMap, inputAriba)
-
+   set val(id),val(organism),file("*val_1.fq.gz"),file("*val_2.fq.gz") into (inputFastqc,inputPathoscopeMap, inputAriba)
+   file "*trimming_report.txt" into trimgalore_results, trimgalore_logs 
+   file "*_fastqc.{zip,html}" into trimgalore_fastqc_reports
+   
    script:
 
-   organism = file(organism_file).getText().trim()
-   
+    c_r1 = clip_r1 > 0 ? "--clip_r1 ${clip_r1}" : ''
+    c_r2 = clip_r2 > 0 ? "--clip_r2 ${clip_r2}" : ''
+    tpc_r1 = three_prime_clip_r1 > 0 ? "--three_prime_clip_r1 ${three_prime_clip_r1}" : ''
+    tpc_r2 = three_prime_clip_r2 > 0 ? "--three_prime_clip_r2 ${three_prime_clip_r2}" : ''
 
-   """
-        java -jar ${TRIMMOMATIC}/trimmomatic-0.36.jar PE -threads 8 $left_reads $right_reads \
-        ${id}_R1_paired.fastq.gz ${id}_1U.fastq.gz ${id}_R2_paired.fastq.gz ${id}_2U.fastq.gz \
-        ILLUMINACLIP:${TRIMMOMATIC}/adapters/${adapters}:2:30:10:3:TRUE\
-        LEADING:${leading} TRAILING:${trailing} SLIDINGWINDOW:${slidingwindow} MINLEN:${minlen}
-
-   """
+    """
+    trim_galore --paired --fastqc --length 35 --gzip $c_r1 $c_r2 $tpc_r1 $tpc_r2 $left $right
+    """
 
 }
 
@@ -136,6 +139,9 @@ process runAriba {
 
    output:
    set organism,file(report) into AribaReport
+
+   when:
+   params.antibiotics == true
 
    script:
 

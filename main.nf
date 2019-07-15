@@ -2,25 +2,17 @@
 
 REPORT_SCRIPT = workflow.projectDir + "/scripts/report.rb"
 
-TRIMMOMATIC = file(params.trimmomatic)
 BLOOMFILTER = params.bloomfilter
-OUTDIR=params.outdir
 
 PATHOSCOPE_INDEX_DIR=file(params.pathoscope_index_dir)
-PATHOSCOPE=file(params.pathoscope)
 
-params.ariba_db = "card"
-params.antibiotics = false
 params.saveTrimmed = true
-
 
 if (params.ariba.containsKey(params.ariba_db) == false) {
    exit 1, "Specified unknown ariba database, please consult the documentation for valid databases."
 }
 
 ARIBA_DB=params.ariba[params.ariba_db].database
-
-FASTQC=file(params.fastqc)
 
 // Trimming parameters
 params.clip_r1 = 0

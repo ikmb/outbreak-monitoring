@@ -1,10 +1,10 @@
 FROM continuumio/anaconda
 LABEL authors="Marc P. Hoeppner" description="Docker image containing software dependencies for the IKMB outbreak pipeline"
 
-COPY environment.yml
+COPY environment.yml /
 RUN conda env create -f /environment.yml && conda clean -a
 
-ENV PATH /opt/conda/envs/ikmb-outbreak-monitoring-1.0/bin:$PATH
+ENV PATH /opt/conda/envs/outbreak-monitoring-1.0/bin:$PATH
 
 RUN apt-get -y install procps make gcc unzip zlib1g-dev build-essential git libboost-all-dev libsparsehash-dev 
 

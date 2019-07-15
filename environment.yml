@@ -1,0 +1,13 @@
+# You can use this file to create a conda environment for this pipeline:
+#   conda env create -f environment.yml
+name: ikmb-outbreak-monitoring-1.0
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - fastqc=0.11.8
+  - multiqc=1.6
+  - ariba=2.14.1
+  - ruby=2.2.3
+  - pathoscope=2.0.7

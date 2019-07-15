@@ -10,6 +10,9 @@ PATHOSCOPE_INDEX_DIR=file(params.pathoscope_index_dir)
 PATHOSCOPE=file(params.pathoscope)
 
 params.ariba_db = "card"
+params.antibiotics = false
+params.saveTrimmed = true
+
 
 if (params.ariba.containsKey(params.ariba_db) == false) {
    exit 1, "Specified unknown ariba database, please consult the documentation for valid databases."
@@ -19,11 +22,11 @@ ARIBA_DB=params.ariba[params.ariba_db].database
 
 FASTQC=file(params.fastqc)
 
-leading = params.leading
-trailing = params.trailing
-slidingwindow = params.slidingwindow
-minlen = params.minlen
-adapters = params.adapters
+// Trimming parameters
+params.clip_r1 = 0
+params.clip_r2 = 0
+params.three_prime_clip_r1 = 0
+params.three_prime_clip_r2 = 0
 
 FOLDER=file(params.folder)
 
@@ -100,8 +103,8 @@ process resultBiobloom {
 
 process runTrimgalore {
 
-   tag "${patientID}|${sampleID}"
-   publishDir "${OUTDIR}/${patientID}/${sampleID}/trimgalore", mode: 'copy',
+   tag "${id}"
+   publishDir "${OUTDIR}/${organism}", mode: 'copy',
         saveAs: {filename ->
             if (filename.indexOf("_fastqc") > 0) "FastQC/$filename"
             else if (filename.indexOf("trimming_report.txt") > 0) "logs/$filename"
@@ -109,19 +112,19 @@ process runTrimgalore {
         }
 
    input:
-   set val(id),val(oganism),left,right from inputTrimgalore
+   set val(id),val(organism_file),left,right from inputTrimgalore
 
    output:
-   set val(id),val(organism),file("*val_1.fq.gz"),file("*val_2.fq.gz") into (inputFastqc,inputPathoscopeMap, inputAriba)
+   set val(id),val(organism),file("*val_1.fq.gz"),file("*val_2.fq.gz") into (inputPathoscopeMap, inputAriba)
    file "*trimming_report.txt" into trimgalore_results, trimgalore_logs 
    file "*_fastqc.{zip,html}" into trimgalore_fastqc_reports
    
    script:
-
-    c_r1 = clip_r1 > 0 ? "--clip_r1 ${clip_r1}" : ''
-    c_r2 = clip_r2 > 0 ? "--clip_r2 ${clip_r2}" : ''
-    tpc_r1 = three_prime_clip_r1 > 0 ? "--three_prime_clip_r1 ${three_prime_clip_r1}" : ''
-    tpc_r2 = three_prime_clip_r2 > 0 ? "--three_prime_clip_r2 ${three_prime_clip_r2}" : ''
+   organism = file(organism_file).getText().trim()
+    c_r1 = params.clip_r1 > 0 ? "--clip_r1 ${clip_r1}" : ''
+    c_r2 = params.clip_r2 > 0 ? "--clip_r2 ${clip_r2}" : ''
+    tpc_r1 = params.three_prime_clip_r1 > 0 ? "--three_prime_clip_r1 ${three_prime_clip_r1}" : ''
+    tpc_r2 = params.three_prime_clip_r2 > 0 ? "--three_prime_clip_r2 ${three_prime_clip_r2}" : ''
 
     """
     trim_galore --paired --fastqc --length 35 --gzip $c_r1 $c_r2 $tpc_r1 $tpc_r2 $left $right
@@ -135,10 +138,10 @@ process runAriba {
    publishDir "${OUTDIR}/${organism}/Ariba/${params.ariba_db}", mode: 'copy'
 
    input:
-   set id,organism,file(left), file(right) from inputAriba
+   set id,val(organism),file(left), file(right) from inputAriba
 
    output:
-   set organism,file(report) into AribaReport
+   set val(organism),file(report) into AribaReport
 
    when:
    params.antibiotics == true
@@ -184,32 +187,13 @@ process runAribaSummary {
 
 }
 
-process Fastqc {
-
-   tag "${id}"
-   publishDir "${OUTDIR}/Data/${id}/FastQC/", mode: 'copy'
-
-    input:
-    set id, organism,file(left_reads), file(right_reads) from inputFastqc
-
-    output:
-    set file("*.zip"), file("*.html") into outputFastqc
-
-    script:
-    """
-    $FASTQC -t 1 -o . ${left_reads} && $FASTQC -t 1 -o . ${right_reads}
-
-    """
-
-}
-
 process runMultiQCFastq {
 
     tag "Generating fastq level summary and QC plots"
     publishDir "${OUTDIR}/Summary/Fastqc", mode: 'copy'
 
     input:
-    file('*') from outputFastqc.flatten().toList()
+    file('*') from trimgalore_fastqc_reports.flatten().toList()
 
     output:
     file("fastq_multiqc*") into runMultiQCFastqOutput
@@ -227,7 +211,7 @@ process runPathoscopeMap {
    //publishDir "${OUTDIR}/Data/${id}/Pathoscope", mode: 'copy'
 
    input:
-   set id,organism,file(left_reads),file(right_reads) from inputPathoscopeMap
+   set id,val(organism),file(left_reads),file(right_reads) from inputPathoscopeMap
 
    output:
    set id,file(pathoscope_sam) into inputPathoscopeId

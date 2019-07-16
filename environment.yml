@@ -10,3 +10,6 @@ dependencies:
   - multiqc=1.6
   - ruby=2.2.3
   - pathoscope=2.0.7
+  - sparsehash=2.0.3
+  - boost  
+  - sdsl-lite=2.1.1

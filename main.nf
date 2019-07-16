@@ -1,18 +1,12 @@
 /* Preprocessing pipeline for short reads to be used in Outbreak monitoring */
 
-REPORT_SCRIPT = workflow.projectDir + "/scripts/report.rb"
+REPORT_SCRIPT = "$baseDir/scripts/report.rb"
 
 BLOOMFILTER = params.bloomfilter
 
 PATHOSCOPE_INDEX_DIR=file(params.pathoscope_index_dir)
 
 params.saveTrimmed = true
-
-if (params.ariba.containsKey(params.ariba_db) == false) {
-   exit 1, "Specified unknown ariba database, please consult the documentation for valid databases."
-}
-
-ARIBA_DB=params.ariba[params.ariba_db].database
 
 // Trimming parameters
 params.clip_r1 = 0
@@ -107,7 +101,7 @@ process runTrimgalore {
    set val(id),val(organism_file),left,right from inputTrimgalore
 
    output:
-   set val(id),val(organism),file("*val_1.fq.gz"),file("*val_2.fq.gz") into (inputPathoscopeMap, inputAriba)
+   set val(id),val(organism),file("*val_1.fq.gz"),file("*val_2.fq.gz") into inputPathoscopeMap
    file "*trimming_report.txt" into trimgalore_results, trimgalore_logs 
    file "*_fastqc.{zip,html}" into trimgalore_fastqc_reports
    
@@ -121,61 +115,6 @@ process runTrimgalore {
     """
     trim_galore --paired --fastqc --length 35 --gzip $c_r1 $c_r2 $tpc_r1 $tpc_r2 $left $right
     """
-
-}
-
-process runAriba {
-
-   tag "${id}"
-   publishDir "${OUTDIR}/${organism}/Ariba/${params.ariba_db}", mode: 'copy'
-
-   input:
-   set id,val(organism),file(left), file(right) from inputAriba
-
-   output:
-   set val(organism),file(report) into AribaReport
-
-   when:
-   params.antibiotics == true
-
-   script:
-
-   report = "report.${id}.tsv"
-
-   """
-	ariba run $ARIBA_DB $left $right out.${id}.run && cp out.${id}.run/report.tsv report.${id}.tsv
-   """	
-
-}
-
-AribaReport
-	.groupTuple(by: 0 )
-	.set { AribaReportByOrganism }
-
-process runAribaSummary {
-
-   tag "SummarizeAriba (ALL)"
-   publishDir "${OUTDIR}/${organism}/Ariba", mode: 'copy'
-
-   input:
-   set organism,reports from AribaReportByOrganism
-
-   output:
-   set file(summary),file(summary_phandango),file(summary_phandango_tre) into outputAribaSummary
-
-   when:
-   reports.size() > 1
-
-   script:
-
-   base = "ariba.summary"
-   summary = "ariba.summary.csv"
-   summary_phandango = "ariba.summary.phandango.csv"
-   summary_phandango_tre = "ariba.summary.phandango.tre"
-
-   """
-        ariba summary $base ${reports.join(" ")}
-   """
 
 }
 

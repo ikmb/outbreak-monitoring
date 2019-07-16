@@ -6,7 +6,7 @@ RUN conda env create -f /environment.yml && conda clean -a
 
 ENV PATH /opt/conda/envs/outbreak-monitoring-1.0/bin:$PATH
 
-RUN apt-get -y install procps make gcc unzip zlib1g-dev build-essential git
+RUN apt-get -y install procps make gcc unzip zlib1g-dev git
 
 RUN cd /opt && \
 	git clone --recurse-submodules https://github.com/bcgsc/biobloom.git build_bloom && \

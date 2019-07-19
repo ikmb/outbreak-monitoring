@@ -9,6 +9,11 @@ ENV PATH /opt/conda/envs/outbreak-monitoring-1.0/bin:$PATH
 RUN apt-get update && apt-get -y install procps make gcc  git build-essential autotools-dev automake libsparsehash-dev libboost-all-dev
 
 RUN cd /opt && \
+	git clone https://github.com/simongog/sdsl-lite.git && \
+	cd sdsl-lite && \
+	./install.sh /usr/local/
+
+RUN cd /opt && \
 	git clone --recurse-submodules https://github.com/bcgsc/biobloom.git build_bloom && \
 	cd build_bloom && \
 	./autogen.sh && \

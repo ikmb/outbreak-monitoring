@@ -15,6 +15,6 @@ RUN cd /opt && \
 	./configure --prefix=/opt/biobloom && make && \
 	cd /opt && rm -Rf build_bloom
 
-ENV PATH /opt/biobloom
+ENV PATH /opt/biobloom/bin
 
 

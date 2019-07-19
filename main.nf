@@ -20,7 +20,7 @@ Channel
         .fromFilePairs(FOLDER + "/*_R{1,2}_001.fastq.gz", flat: true)
         .map { prefix, file1, file2 ->  tuple(prefix.split("_")[0..1].join("_"), file1, file2) }
         .groupTuple()
-        .into { inputMerge }
+        .set { inputMerge }
 
 process Merge {
 

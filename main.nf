@@ -16,6 +16,9 @@ params.three_prime_clip_r2 = 0
 
 FOLDER=file(params.folder)
 
+log.info "## Outbreak Monitoring Pre-processing"
+log.info "Container engine:	${workflow.containerEngine}"
+log.info "#####################################"
 Channel
         .fromFilePairs(FOLDER + "/*_R{1,2}_001.fastq.gz", flat: true)
         .map { prefix, file1, file2 ->  tuple(prefix.split("_")[0..1].join("_"), file1, file2) }

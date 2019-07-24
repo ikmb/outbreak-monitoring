@@ -6,7 +6,8 @@ RUN conda env create -f /environment.yml && conda clean -a
 
 ENV PATH /opt/conda/envs/outbreak-monitoring-1.0/bin:$PATH
 
-RUN apt-get update && apt-get -y install procps make gcc  git build-essential autotools-dev automake libsparsehash-dev libboost-all-dev cmake zlib1g-dev coreutils
+RUN apt-get update && apt-get -y install procps make gcc  git build-essential autotools-dev automake libsparsehash-dev libboost-all-dev \
+cmake zlib1g-dev coreutils grep awk
 
 RUN cd /opt && \
 	git clone https://github.com/simongog/sdsl-lite.git && \

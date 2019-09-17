@@ -1,4 +1,4 @@
-FROM continuumio/anaconda
+FROM nfcore/base
 LABEL authors="Marc P. Hoeppner" description="Docker image containing software dependencies for the IKMB outbreak pipeline"
 
 COPY environment.yml /

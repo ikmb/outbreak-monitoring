@@ -18,7 +18,7 @@ RUN cd /opt && \
 	git clone --recurse-submodules https://github.com/bcgsc/biobloom.git build_bloom && \
 	cd build_bloom && \
 	./autogen.sh && \
-	./configure --prefix=/opt/biobloom && make && \
+	./configure --prefix=/opt/biobloom && make install && \
 	cd /opt && rm -Rf build_bloom
 
 ENV PATH /opt/biobloom/bin

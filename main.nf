@@ -6,6 +6,8 @@ BLOOMFILTER = params.bloomfilter
 
 PATHOSCOPE_INDEX_DIR=file(params.pathoscope_index_dir)
 
+OUTDIR = params.outdir
+
 params.saveTrimmed = true
 
 // Trimming parameters
@@ -34,7 +36,7 @@ process Merge {
         set id,forward_reads,reverse_reads from inputMerge
 
         output:
-        set id,file(left_merged),file(right_merged) into inputBioBloom
+        set val(id),file(left_merged),file(right_merged) into inputBioBloom
 
         script:
         left_merged = id + "_R1.fastq.gz"

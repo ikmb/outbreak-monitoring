@@ -10,3 +10,4 @@ dependencies:
   - multiqc=1.6
   - ruby=2.2.3
   - pathoscope=2.0.7
+  - fastp=0.20.0

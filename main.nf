@@ -42,10 +42,17 @@ process Merge {
         left_merged = id + "_R1.fastq.gz"
         right_merged = id + "_R2.fastq.gz"
 
-        """
-                zcat ${forward_reads.join(" ")} | gzip > $left_merged
-		zcat ${reverse_reads.join(" ")} | gzip > $right_merged
-        """
+	if (forward_reads.length > 1 && forward_reads.length << 100) {
+	        """
+        	        zcat ${forward_reads.join(" ")} | gzip > $left_merged
+			zcat ${reverse_reads.join(" ")} | gzip > $right_merged
+	        """
+	} else {
+		"""	
+			cp $forward_reads $left_merged
+			cp $reverse_reads $right_merged
+		"""
+	}
 }
 
 process Bloomfilter {
@@ -79,7 +86,7 @@ process resultBiobloom {
   set id,file(bloom),file(left_reads),file(right_reads) from outputBloomfilter
 
   output:
-  set id,file(bloomresult),file(left_reads),file(right_reads) into inputTrimgalore
+  set id,file(bloomresult),file(left_reads),file(right_reads) into inputFastp
 
   script:
 
@@ -91,35 +98,28 @@ process resultBiobloom {
   """
 }
 
+process runFastp {
 
-process runTrimgalore {
+	publishDir "${OUTDIR}/${organism}", mode: 'copy'
 
-   tag "${id}"
-   publishDir "${OUTDIR}/${organism}", mode: 'copy',
-        saveAs: {filename ->
-            if (filename.indexOf("_fastqc") > 0) "FastQC/$filename"
-            else if (filename.indexOf("trimming_report.txt") > 0) "logs/$filename"
-            else params.saveTrimmed ? filename : null
-        }
+	input:
+	set val(id),val(organism_file),fastqR1,fastqR2 from inputFastp
 
-   input:
-   set val(id),val(organism_file),left,right from inputTrimgalore
+	output:
+	set val(id),val(organism),file("*val_1.fq.gz"),file("*val_2.fq.gz") into inputPathoscopeMap
+   	set file(json),file(html) into fastp_logs
 
-   output:
-   set val(id),val(organism),file("*val_1.fq.gz"),file("*val_2.fq.gz") into inputPathoscopeMap
-   file "*trimming_report.txt" into trimgalore_results, trimgalore_logs 
-   file "*_fastqc.{zip,html}" into trimgalore_fastqc_reports
-   
-   script:
-   organism = file(organism_file).getText().trim()
-    c_r1 = params.clip_r1 > 0 ? "--clip_r1 ${clip_r1}" : ''
-    c_r2 = params.clip_r2 > 0 ? "--clip_r2 ${clip_r2}" : ''
-    tpc_r1 = params.three_prime_clip_r1 > 0 ? "--three_prime_clip_r1 ${three_prime_clip_r1}" : ''
-    tpc_r2 = params.three_prime_clip_r2 > 0 ? "--three_prime_clip_r2 ${three_prime_clip_r2}" : ''
+	script:
+	organism = file(organism_file).getText().trim()
 
-    """
-    trim_galore --paired --fastqc --length 35 --gzip $c_r1 $c_r2 $tpc_r1 $tpc_r2 $left $right
-    """
+	left = file(fastqR1).getBaseName() + "_trimmed.fastq.gz"
+	right = file(fastqR2).getBaseName() + "_trimmed.fastq.gz"
+	json = file(fastqR1).getBaseName() + ".fastp.json"
+	html = file(fastqR1).getBaseName() + ".fastp.html"
+
+	"""
+		fastp --in1 $fastqR1 --in2 $fastqR2 --out1 $left --out2 $right --detect_adapter_for_pe -w ${task.cpus} -j $json -h $html --length_required 35
+	"""
 
 }
 
@@ -129,7 +129,7 @@ process runMultiQCFastq {
     publishDir "${OUTDIR}/Summary/Fastqc", mode: 'copy'
 
     input:
-    file('*') from trimgalore_fastqc_reports.flatten().toList()
+    file('*') from fastp_logs.flatten().toList()
 
     output:
     file("fastq_multiqc*") into runMultiQCFastqOutput
@@ -137,7 +137,7 @@ process runMultiQCFastq {
     script:
 
     """
-    /ifs/data/nfs_share/ikmb_repository/software/multiqc_local/1.2/bin/multiqc -n fastq_multiqc *.zip *.html
+    multiqc -n fastq_multiqc *.zip *.html
     """
 }
 
@@ -159,7 +159,7 @@ process runPathoscopeMap {
    pathoscope_sam = id + ".sam"
 
    """
-	$PATHOSCOPE MAP -1 $left_reads -2 $right_reads -indexDir $PATHOSCOPE_INDEX_DIR -filterIndexPrefixes hg19_rRNA \
+	pathoscope2.py MAP -1 $left_reads -2 $right_reads -indexDir $PATHOSCOPE_INDEX_DIR -filterIndexPrefixes hg19_rRNA \
 	-targetIndexPrefix A-Lbacteria.fa,M-Zbacteria.fa,virus.fa -outAlign $pathoscope_sam -expTag $id -numThreads 8
    """
 
@@ -182,7 +182,7 @@ process runPathoscopeId {
    pathoscope_tsv = id + "-sam-report.tsv"
 
    """
-	$PATHOSCOPE ID -alignFile $samfile -fileType sam -expTag $id
+	pathoscope2.py ID -alignFile $samfile -fileType sam -expTag $id
    """
 
 }

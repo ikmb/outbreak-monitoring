@@ -4,7 +4,7 @@ LABEL authors="Marc P. Hoeppner" description="Docker image containing software d
 COPY environment.yml /
 RUN conda env create -f /environment.yml && conda clean -a
 
-ENV PATH /opt/conda/envs/outbreak-monitoring-1.0/bin:$PATH
+ENV PATH /opt/biobloom/bin:/opt/conda/envs/outbreak-monitoring-1.0/bin:$PATH
 
 RUN apt-get update && apt-get -y install procps make gcc  git build-essential autotools-dev automake libsparsehash-dev libboost-all-dev \
 cmake zlib1g-dev coreutils grep gawk
@@ -20,7 +20,3 @@ RUN cd /opt && \
 	./autogen.sh && \
 	./configure --prefix=/opt/biobloom && make install && \
 	cd /opt && rm -Rf build_bloom
-
-ENV PATH /opt/biobloom/bin
-
-

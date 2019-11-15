@@ -8,14 +8,6 @@ PATHOSCOPE_INDEX_DIR=file(params.pathoscope_index_dir)
 
 OUTDIR = params.outdir
 
-params.saveTrimmed = true
-
-// Trimming parameters
-params.clip_r1 = 0
-params.clip_r2 = 0
-params.three_prime_clip_r1 = 0
-params.three_prime_clip_r2 = 0
-
 FOLDER=file(params.folder)
 
 log.info "## Outbreak Monitoring Pre-processing"
@@ -23,9 +15,9 @@ log.info "Container engine:	${workflow.containerEngine}"
 log.info "#####################################"
 Channel
         .fromFilePairs(FOLDER + "/*_R{1,2}_001.fastq.gz", flat: true)
-        .map { prefix, file1, file2 ->  tuple(prefix.split("_")[0..1].join("_"), file1, file2) }
-        .groupTuple()
-        .set { inputMerge }
+        .set { reads }
+
+inputMerge = reads.groupTuple(by: 0)
 
 process Merge {
 
@@ -33,7 +25,7 @@ process Merge {
         publishDir("${OUTDIR}/Data/${id}")
 
         input:
-        set id,forward_reads,reverse_reads from inputMerge
+        set id,file(forward_reads),file(reverse_reads) from inputMerge
 
         output:
         set val(id),file(left_merged),file(right_merged) into inputBioBloom
@@ -42,7 +34,7 @@ process Merge {
         left_merged = id + "_R1.fastq.gz"
         right_merged = id + "_R2.fastq.gz"
 
-	if (forward_reads.length > 1 && forward_reads.length << 100) {
+	if (forward_reads.size() > 1 && forward_reads.size() < 100) {
 	        """
         	        zcat ${forward_reads.join(" ")} | gzip > $left_merged
 			zcat ${reverse_reads.join(" ")} | gzip > $right_merged

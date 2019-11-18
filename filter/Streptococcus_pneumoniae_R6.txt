@@ -1,14 +1,14 @@
 [user_input_options]
 filter_id=Streptococcus_pneumoniae_R6
 kmer_size=25
-desired_false_positve_rate=0.0075
+desired_false_positve_rate=0.0078125
 number_of_hash_functions=7
-expected_num_entries=2038590
+expected_num_entries=2038591
 sequence_sources=Streptococcus_pneumoniae_R6.fa 
 
 [runtime_options]
-size=20761152
-num_entries=1975832
-approximate_false_positive_rate=0.00643518
-redundant_sequences=62759
-redundant_fpr=0.00104122
+size=20587456
+num_entries=1975690
+approximate_false_positive_rate=0.00670426
+redundant_sequences=62901
+redundant_fpr=0.00108708

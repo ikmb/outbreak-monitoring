@@ -1,14 +1,14 @@
 [user_input_options]
 filter_id=Klebsiella_oxytoca
 kmer_size=25
-desired_false_positve_rate=0.0075
+desired_false_positve_rate=0.0078125
 number_of_hash_functions=7
-expected_num_entries=7226985
+expected_num_entries=7226997
 sequence_sources=Klebsiella_oxytoca.fa 
 
 [runtime_options]
-size=73600000
-num_entries=6887412
-approximate_false_positive_rate=0.00592098
-redundant_sequences=339585
-redundant_fpr=0.00095395
+size=72984512
+num_entries=6887246
+approximate_false_positive_rate=0.00617147
+redundant_sequences=339751
+redundant_fpr=0.000996408

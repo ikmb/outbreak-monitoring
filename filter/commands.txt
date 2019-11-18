@@ -1,0 +1,16 @@
+#!/bin/bash
+biobloommaker –p Acinetobacter_baumannii Acinetobacter_baumannii.fa
+biobloommaker –p Citrobacter_freundii Citrobacter_freundii.fa
+biobloommaker –p Enterobacter_aerogenes Enterobacter_aerogenes.fa
+biobloommaker –p Enterobacter_cloacae Enterobacter_cloacae.fa
+biobloommaker –p Enterococcus_faecalis_V583 Enterococcus_faecalis_V583.fa
+biobloommaker –p Enterococcus_faecium Enterococcus_faecium.fa
+biobloommaker –p Escherichia_coli_K12 Escherichia_coli_K12.fa
+biobloommaker –p Klebsiella_aerogenes Klebsiella_aerogenes.fa
+biobloommaker –p Klebsiella_oxytoca Klebsiella_oxytoca.fa
+biobloommaker –p Klebsiella_pneumoniae Klebsiella_pneumoniae.fa
+biobloommaker –p Proteus_mirabilis Proteus_mirabilis.fa
+biobloommaker –p Pseudomonas_aeruginosa_PAO1 Pseudomonas_aeruginosa_PAO1.fa
+biobloommaker –p Serratia_marcescens Serratia_marcescens.fa
+biobloommaker –p Staphylococcus_aureus_NCTC8325 Staphylococcus_aureus_NCTC8325.fa
+biobloommaker –p Streptococcus_pneumoniae_R6 Streptococcus_pneumoniae_R6.fa

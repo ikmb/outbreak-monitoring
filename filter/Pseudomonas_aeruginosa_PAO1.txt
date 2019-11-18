@@ -1,14 +1,14 @@
 [user_input_options]
 filter_id=Pseudomonas_aeruginosa_PAO1
 kmer_size=25
-desired_false_positve_rate=0.0075
+desired_false_positve_rate=0.0078125
 number_of_hash_functions=7
-expected_num_entries=6264379
+expected_num_entries=6264380
 sequence_sources=Pseudomonas_aeruginosa_PAO1.fa 
 
 [runtime_options]
-size=63796800
-num_entries=6191241
-approximate_false_positive_rate=0.00708235
-redundant_sequences=73139
-redundant_fpr=0.00115171
+size=63263168
+num_entries=6190987
+approximate_false_positive_rate=0.00737732
+redundant_sequences=73393
+redundant_fpr=0.0012023

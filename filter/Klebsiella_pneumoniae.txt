@@ -1,14 +1,14 @@
 [user_input_options]
 filter_id=Klebsiella_pneumoniae
 kmer_size=25
-desired_false_positve_rate=0.0075
+desired_false_positve_rate=0.0078125
 number_of_hash_functions=7
-expected_num_entries=5682147
+expected_num_entries=5682154
 sequence_sources=Klebsiella_pneumoniae.fa 
 
 [runtime_options]
-size=57867328
-num_entries=5565954
-approximate_false_positive_rate=0.00677969
-redundant_sequences=116175
-redundant_fpr=0.00109996
+size=57383360
+num_entries=5565679
+approximate_false_positive_rate=0.00706271
+redundant_sequences=116450
+redundant_fpr=0.00114835

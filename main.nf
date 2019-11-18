@@ -21,7 +21,6 @@ inputMerge = reads.groupTuple(by: 0)
 
 process Merge {
 
-	tag "${id}"
         publishDir("${OUTDIR}/Data/${id}")
 
         input:
@@ -49,7 +48,6 @@ process Merge {
 
 process Bloomfilter {
 
-  tag "${id}"
   publishDir "${OUTDIR}/Data/${id}", mode: 'copy'
 
   input:
@@ -71,7 +69,6 @@ process Bloomfilter {
 
 process resultBiobloom {
 
-  tag "${id}"
   publishDir "${OUTDIR}/Data/${id}", mode: 'copy'
 
   input: 
@@ -98,7 +95,7 @@ process runFastp {
 	set val(id),val(organism_file),fastqR1,fastqR2 from inputFastp
 
 	output:
-	set val(id),val(organism),file("*val_1.fq.gz"),file("*val_2.fq.gz") into inputPathoscopeMap
+	set val(id),val(organism),file(left),file(right) into inputPathoscopeMap
    	set file(json),file(html) into fastp_logs
 
 	script:
@@ -117,7 +114,6 @@ process runFastp {
 
 process runMultiQCFastq {
 
-    tag "Generating fastq level summary and QC plots"
     publishDir "${OUTDIR}/Summary/Fastqc", mode: 'copy'
 
     input:
@@ -129,13 +125,12 @@ process runMultiQCFastq {
     script:
 
     """
-    multiqc -n fastq_multiqc *.zip *.html
+    multiqc -n fastq_multiqc *.json *.html
     """
 }
 
 process runPathoscopeMap {
 
-   tag "${id}"
    //publishDir "${OUTDIR}/Data/${id}/Pathoscope", mode: 'copy'
 
    input:
@@ -151,7 +146,7 @@ process runPathoscopeMap {
    pathoscope_sam = id + ".sam"
 
    """
-	pathoscope2.py MAP -1 $left_reads -2 $right_reads -indexDir $PATHOSCOPE_INDEX_DIR -filterIndexPrefixes hg19_rRNA \
+	pathoscope MAP -1 $left_reads -2 $right_reads -indexDir $PATHOSCOPE_INDEX_DIR -filterIndexPrefixes hg19_rRNA \
 	-targetIndexPrefix A-Lbacteria.fa,M-Zbacteria.fa,virus.fa -outAlign $pathoscope_sam -expTag $id -numThreads 8
    """
 
@@ -159,7 +154,6 @@ process runPathoscopeMap {
 
 process runPathoscopeId {
 
-   tag "${id}"
    publishDir "${OUTDIR}/Data/${id}/Pathoscope", mode: 'copy'
 
    input:
@@ -174,7 +168,7 @@ process runPathoscopeId {
    pathoscope_tsv = id + "-sam-report.tsv"
 
    """
-	pathoscope2.py ID -alignFile $samfile -fileType sam -expTag $id
+	pathoscope ID -alignFile $samfile -fileType sam -expTag $id
    """
 
 }

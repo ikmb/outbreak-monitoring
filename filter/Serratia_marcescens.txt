@@ -1,14 +1,14 @@
 [user_input_options]
 filter_id=Serratia_marcescens
 kmer_size=25
-desired_false_positve_rate=0.0075
+desired_false_positve_rate=0.0078125
 number_of_hash_functions=7
-expected_num_entries=5113777
+expected_num_entries=5113778
 sequence_sources=Serratia_marcescens.fa 
 
 [runtime_options]
-size=52078976
-num_entries=5063710
-approximate_false_positive_rate=0.00714862
-redundant_sequences=50068
-redundant_fpr=0.00116307
+size=51643392
+num_entries=5063626
+approximate_false_positive_rate=0.007447
+redundant_sequences=50152
+redundant_fpr=0.00121427

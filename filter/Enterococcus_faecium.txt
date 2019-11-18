@@ -1,14 +1,14 @@
 [user_input_options]
 filter_id=Enterococcus_faecium
 kmer_size=25
-desired_false_positve_rate=0.0075
+desired_false_positve_rate=0.0078125
 number_of_hash_functions=7
 expected_num_entries=3019684
 sequence_sources=Enterococcus_faecium.fa 
 
 [runtime_options]
-size=30752640
-num_entries=2832603
-approximate_false_positive_rate=0.00547299
-redundant_sequences=187081
-redundant_fpr=0.000878303
+size=30495424
+num_entries=2832493
+approximate_false_positive_rate=0.00570551
+redundant_sequences=187191
+redundant_fpr=0.000917519

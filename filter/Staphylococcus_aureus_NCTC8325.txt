@@ -1,14 +1,14 @@
 [user_input_options]
 filter_id=Staphylococcus_aureus_NCTC8325
 kmer_size=25
-desired_false_positve_rate=0.0075
+desired_false_positve_rate=0.0078125
 number_of_hash_functions=7
-expected_num_entries=2821336
+expected_num_entries=2821337
 sequence_sources=Staphylococcus_aureus_NCTC8325.fa 
 
 [runtime_options]
-size=28732672
-num_entries=2770443
-approximate_false_positive_rate=0.00686187
-redundant_sequences=50869
-redundant_fpr=0.00111399
+size=28492352
+num_entries=2770328
+approximate_false_positive_rate=0.00714834
+redundant_sequences=50984
+redundant_fpr=0.00116302

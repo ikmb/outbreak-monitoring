@@ -1,14 +1,14 @@
 [user_input_options]
 filter_id=Escherichia_coli_K12
 kmer_size=25
-desired_false_positve_rate=0.0075
+desired_false_positve_rate=0.0078125
 number_of_hash_functions=7
-expected_num_entries=4641627
+expected_num_entries=4641628
 sequence_sources=Escherichia_coli_K12.fa 
 
 [runtime_options]
-size=47270592
-num_entries=4544015
-approximate_false_positive_rate=0.00676
-redundant_sequences=97613
-redundant_fpr=0.00109659
+size=46875200
+num_entries=4543639
+approximate_false_positive_rate=0.00704114
+redundant_sequences=97989
+redundant_fpr=0.00114466

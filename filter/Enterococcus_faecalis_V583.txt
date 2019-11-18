@@ -1,14 +1,14 @@
 [user_input_options]
 filter_id=Enterococcus_faecalis_V583
 kmer_size=25
-desired_false_positve_rate=0.0075
+desired_false_positve_rate=0.0078125
 number_of_hash_functions=7
-expected_num_entries=3359874
+expected_num_entries=3359878
 sequence_sources=Enterococcus_faecalis_V583.fa 
 
 [runtime_options]
-size=34217152
-num_entries=3275961
-approximate_false_positive_rate=0.00662726
-redundant_sequences=83917
-redundant_fpr=0.00107394
+size=33931008
+num_entries=3275985
+approximate_false_positive_rate=0.00690629
+redundant_sequences=83893
+redundant_fpr=0.00112159

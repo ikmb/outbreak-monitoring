@@ -101,10 +101,10 @@ process runFastp {
 	script:
 	organism = file(organism_file).getText().trim()
 
-	left = file(fastqR1).getBaseName() + "_trimmed.fastq.gz"
-	right = file(fastqR2).getBaseName() + "_trimmed.fastq.gz"
-	json = file(fastqR1).getBaseName() + ".fastp.json"
-	html = file(fastqR1).getBaseName() + ".fastp.html"
+	left = file(fastqR1).getSimpleName() + "_trimmed.fastq.gz"
+	right = file(fastqR2).getSimpleName() + "_trimmed.fastq.gz"
+	json = file(fastqR1).getSimpleName() + ".fastp.json"
+	html = file(fastqR1).getSimpleName() + ".fastp.html"
 
 	"""
 		fastp --in1 $fastqR1 --in2 $fastqR2 --out1 $left --out2 $right --detect_adapter_for_pe -w ${task.cpus} -j $json -h $html --length_required 35

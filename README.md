@@ -40,6 +40,7 @@ In addition, the topfolder will contain one folder per supported species with th
 * K. oxytoca
 * S. marcescens
 * P. mirabilis
+* M. morganii
 
 Should your data contain any other species, the respective reads will be put in the folder "noMatch" fur manual follow up. Should the reads belong to a species not yet supported, consider adding a new bloom filter. 
 

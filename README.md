@@ -22,9 +22,10 @@ Note: This pipeline cannot be executed directly from gitlab as it requires certa
 
 The output will be gathered in the folder "output" (can be modified by using the --outdir flag), divided by library ID. 
 In the topfolder you will find one subfolder per input PE library with
-* Trimmed reads (using Trimmomatic and Nextera adapters)
-* FastQC statistics
+* Trimmed reads (using Fastp with automatic adapter recognition)
+* Trimming statistics
 * Bloomfilter raw outut
+* Taxonomic assignment using Pathoscope (if Bloomfilters fail)
 
 In addition, the topfolder will contain one folder per supported species with the trimmed read files. Currently, the following species are supported:
 * E. coli
@@ -45,8 +46,9 @@ Should your data contain any other species, the respective reads will be put in 
 Reference genome sequences can be downloaded from:
 ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/bacteria/
 
-To produce a bloom filter, load BioBloom and rename the Fasta to GENUS_SPECIES.fa and index it with Samtools.
+To produce a bloom filter, load BioBloom, place the genome sequence into the subfolder "filter, rename it to GENUS_SPECIES.fa and index it with Samtools using `samtools faidx GENUS_SPECIES.fa`.
 
 Then run the Bloomfilter: biobloommaker -p GENUS_SPECIES GENUS_SPECIES.fa
+
 
 

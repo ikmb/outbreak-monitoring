@@ -1,13 +1,13 @@
 # You can use this file to create a conda environment for this pipeline:
 #   conda env create -f environment.yml
-name: outbreak-monitoring-1.0
+name: outbreak-monitoring-1.1
 channels:
   - bioconda
   - conda-forge
   - defaults
 dependencies:
   - fastqc=0.11.8
-  - multiqc=1.6
+  - multiqc=1.8
   - ruby=2.2.3
   - pathoscope=2.0.7
-  - fastp=0.20.0
+  - fastp=0.20.1
